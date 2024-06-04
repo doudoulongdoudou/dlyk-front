@@ -5,8 +5,11 @@ import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
-import LoginView from './view/LoginView.vue'
+import router from "./router/router.js";
 
-const app = createApp(LoginView)
+import App from "./App.vue";
+
+const app = createApp(App)
 app.use(ElementPlus)
+app.use(router)
 app.mount('#app')

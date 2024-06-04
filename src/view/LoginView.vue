@@ -41,7 +41,7 @@
 
 <script>
 import {doPost} from "../http/httpRequest.js";
-import {ElMessage} from "element-plus";
+import {messageTip} from "../util/util.js";
 
 export default {
   name: "LoginView",
@@ -61,7 +61,11 @@ export default {
             userList: [{}]
             */
 
-      user: {},
+      user: {
+        //临时设置用户名和密码，便于开发
+        loginAct: "admin",
+        loginPwd: "aaa111"
+      },
       //定义登录表单验证规则
       loginRules: {
         //定义账号验证规则，规则可以有多个所以是数组
@@ -90,11 +94,22 @@ export default {
           let formData = new FormData();
           formData.append("loginAct", this.user.loginAct);
           formData.append("loginPwd", this.user.loginPwd);
+
           //验证通过可以提交登录,此处是封装了axios的方法，也可以直接使用axios.post
           doPost("/api/login", formData).then((resp) => {
             console.log(resp);
+            //===必须类型和值都相等，而==的话类型可以不相同，即数字200和字符串"200"
+            if (resp.data.code === 200) {
+              //登录成功
+              messageTip("登录成功",'success');
+              //跳转系统的主页面
+              window.location.href = "/dashboard";
+            } else {
+              //登录失败
+              messageTip("用户名或密码错误",'error')
+            }
+
           })
-          ElMessage("登录成功");
 
         }
       })
@@ -129,7 +144,7 @@ export default {
 }
 
 img {
-  height: 600px;
+  height: 620px;
   margin-top: 100px;
 }
 
