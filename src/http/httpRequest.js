@@ -4,55 +4,37 @@ import axios from "axios";
 axios.defaults.baseURL = "http://localhost:8080"
 
 export function doGet(url, params) {
-    axios({
+    return axios({
         method: "get",
         url: url,
-        params:params,
+        params: params,
         dataType: "json"
-    }).then(function (rep) {
-        var s = "";
-        rep.data.forEach(function (stu) {
-            s += stu.name + "---------" + stu.age + "<br>";
-        });
-        document.getElementById("mydiv").innerHTML = s;
     })
 }
 
-export function doPost(url,data){
+export function doPost(url, data) {
     return axios({
         method: "post",
         url: url,
-        data:data,
+        data: data,
         dataType: "json"
     })
 }
 
-export function doPut(url,data){
-    axios({
+export function doPut(url, data) {
+    return axios({
         method: "put",
         url: url,
-        data:data,
+        data: data,
         dataType: "json"
-    }).then(function (rep) {
-        var s = "";
-        rep.data.forEach(function (stu) {
-            s += stu.name + "---------" + stu.age + "<br>";
-        });
-        document.getElementById("mydiv").innerHTML = s;
     })
 }
 
 export function doDelete(url, params) {
-    axios({
+    return axios({
         method: "delete",
         url: url,
-        params:params,
+        params: params,
         dataType: "json"
-    }).then(function (rep) {
-        var s = "";
-        rep.data.forEach(function (stu) {
-            s += stu.name + "---------" + stu.age + "<br>";
-        });
-        document.getElementById("mydiv").innerHTML = s;
     })
 }

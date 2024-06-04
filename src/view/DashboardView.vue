@@ -1,13 +1,292 @@
 <template>
-  <p>dash</p>
+  <el-container>
+    <!-- 左侧 -->
+    <el-aside :width="isCollapse ? '64px' : '200px'">
+      <div class="menuTitle">动力云客管理系统</div>
+      <el-menu
+          active-text-color="#ffd04b"
+          background-color="#334157"
+          class="el-menu-vertical-demo"
+          default-active="2"
+          text-color="#fff"
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          style="border-right: solid 0px"
+          @open="handleOpen"
+          @close="handleClose"
+      >
+
+        <!-- 市场活动 -->
+        <el-sub-menu index="1">
+          <template #title>
+            <el-icon>
+              <Shop/>
+            </el-icon>
+            <span>市场活动</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="1-1">
+              <el-icon>
+                <Shop/>
+              </el-icon>
+              市场活动
+            </el-menu-item>
+            <el-menu-item index="1-2">
+              <el-icon>
+                <Histogram/>
+              </el-icon>
+              市场统计
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 线索管理 -->
+        <el-sub-menu index="2">
+          <template #title>
+            <el-icon>
+              <Search/>
+            </el-icon>
+            <span>线索管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="2-1">
+              <el-icon>
+                <Search/>
+              </el-icon>
+              线索管理
+            </el-menu-item>
+            <el-menu-item index="2-2">
+              <el-icon>
+                <Histogram/>
+              </el-icon>
+              线索统计
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 客户管理 -->
+        <el-sub-menu index="3">
+          <template #title>
+            <el-icon>
+              <Phone/>
+            </el-icon>
+            <span>客户管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="3-1">
+              <el-icon>
+                <Phone/>
+              </el-icon>
+              客户管理
+            </el-menu-item>
+            <el-menu-item index="3-2">
+              <el-icon>
+                <Histogram/>
+              </el-icon>
+              客户统计
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 交易管理 -->
+        <el-sub-menu index="4">
+          <template #title>
+            <el-icon>
+              <Wallet/>
+            </el-icon>
+            <span>交易管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="4-1">
+              <el-icon>
+                <Wallet/>
+              </el-icon>
+              交易管理
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 产品管理 -->
+        <el-sub-menu index="5">
+          <template #title>
+            <el-icon>
+              <Box/>
+            </el-icon>
+            <span>产品管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="5-1">
+              <el-icon>
+                <Box/>
+              </el-icon>
+              产品管理
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 字典管理 -->
+        <el-sub-menu index="6">
+          <template #title>
+            <el-icon>
+              <Key/>
+            </el-icon>
+            <span>字典管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="6-1">
+              <el-icon>
+                <Key/>
+              </el-icon>
+              字典管理
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 用户管理 -->
+        <el-sub-menu index="7">
+          <template #title>
+            <el-icon>
+              <User/>
+            </el-icon>
+            <span>用户管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="7-1">
+              <el-icon>
+                <User/>
+              </el-icon>
+              用户管理
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+        <!-- 系统管理 -->
+        <el-sub-menu index="8">
+          <template #title>
+            <el-icon>
+              <Setting/>
+            </el-icon>
+            <span>系统管理</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="8-1">
+              <el-icon>
+                <Setting/>
+              </el-icon>
+              系统管理
+            </el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+
+      </el-menu>
+    </el-aside>
+
+    <!-- 右侧 -->
+    <el-container class="rightContent">
+      <!-- 上侧 -->
+      <el-header>
+        <!-- 菜单左右折叠按钮 -->
+        <el-icon class="show" @click="showMenu">
+          <Fold/>
+        </el-icon>
+
+        <el-dropdown :hide-on-click="false">
+          <span class="el-dropdown-link">豆豆龙<el-icon class="el-icon--right"><arrow-down/></el-icon></span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>我的资料</el-dropdown-item>
+              <el-dropdown-item>修改密码</el-dropdown-item>
+              <el-dropdown-item divided>退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </el-header>
+
+      <!-- 中间 -->
+      <el-main>Main</el-main>
+
+      <!-- 下侧 -->
+      <el-footer>Copyright ©2024 豆豆龙科技无限责任公司版权所有 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
+      </el-footer>
+
+    </el-container>
+  </el-container>
+
 </template>
 
 <script>
+import {doGet} from "../http/httpRequest.js";
+
 export default {
-  name: "DashboardView"
+  name: "DashboardView",
+
+  data() {
+    return {
+      //控制左侧菜单是否展开折叠，true为折叠
+      isCollapse: false
+    }
+  },
+
+  //函数钩子
+  mounted() {
+    //加载当前登录用户
+    this.loadLoginUser();
+  },
+
+  methods: {
+    //左侧菜单左右展开折叠
+    showMenu() {
+      this.isCollapse = !this.isCollapse;
+    },
+
+    loadLoginUser() {
+      doGet("api/login/info", {}).then( (resp) => {
+        console.log(resp);
+      })
+    }
+  }
 }
 </script>
 
 <style scoped>
+.el-aside {
+  background: #334157;
+}
+
+.el-header {
+  background: #c6e2ff;
+  height: 35px;
+  line-height: 35px;
+}
+
+.el-footer {
+  background: #c6e2ff;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+}
+
+.el-dropdown {
+  line-height: 35px;
+  float: right;
+  cursor: pointer;
+}
+
+.rightContent {
+  height: calc(100vh);
+}
+
+.menuTitle {
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
+}
+
+.show {
+  cursor: pointer;
+}
+
 
 </style>
