@@ -16,11 +16,23 @@
 
         <el-form ref="LoginRefForm" :model="user" label-width="auto" :rules="loginRules">
           <el-form-item prop="loginAct">
-            <el-input v-model="user.loginAct" placeholder="用户名" clearable/>
+            <el-input v-model="user.loginAct" placeholder="用户名" clearable>
+              <template #prefix>
+                <el-icon>
+                  <User/>
+                </el-icon>
+              </template>
+            </el-input>
           </el-form-item>
 
           <el-form-item prop="loginPwd">
-            <el-input type="password" v-model="user.loginPwd" placeholder="密码" show-password/>
+            <el-input type="password" v-model="user.loginPwd" placeholder="密码" show-password>
+              <template #prefix>
+                <el-icon>
+                  <Lock/>
+                </el-icon>
+              </template>
+            </el-input>
           </el-form-item>
 
           <el-form-item>
@@ -28,7 +40,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-checkbox value="记住我" name="rememberMe">记住我</el-checkbox>
+            <el-checkbox value="记住我" v-model="user.rememberMe">记住我</el-checkbox>
             <el-link href="">忘记密码？</el-link>
           </el-form-item>
         </el-form>
@@ -40,8 +52,8 @@
 </template>
 
 <script>
-import {doPost} from "../http/httpRequest.js";
-import {messageTip} from "../util/util.js";
+import {doGet, doPost} from "../http/httpRequest.js";
+import {getTokenName, messageTip, removeToken} from "../util/util.js";
 
 export default {
   name: "LoginView",
@@ -63,8 +75,9 @@ export default {
 
       user: {
         //临时设置用户名和密码，便于开发
-        loginAct: "admin",
-        loginPwd: "aaa111"
+        loginAct: "ddl",
+        loginPwd: "aaa111",
+        rememberMe: false,
       },
       //定义登录表单验证规则
       loginRules: {
@@ -82,6 +95,10 @@ export default {
     }
   },
 
+  mounted() {
+    this.freeLogin();
+  },
+
   //页面上需要使用功能的js函数，都在methods属性中定义
   methods: {
     //登录函数
@@ -94,6 +111,7 @@ export default {
           let formData = new FormData();
           formData.append("loginAct", this.user.loginAct);
           formData.append("loginPwd", this.user.loginPwd);
+          formData.append("rememberMe", this.user.rememberMe);
 
           //验证通过可以提交登录,此处是封装了axios的方法，也可以直接使用axios.post
           doPost("/api/login", formData).then((resp) => {
@@ -101,18 +119,43 @@ export default {
             //===必须类型和值都相等，而==的话类型可以不相同，即数字200和字符串"200"
             if (resp.data.code === 200) {
               //登录成功
-              messageTip("登录成功",'success');
+              messageTip("登录成功", 'success');
+
+              //删除历史存储的token
+              removeToken();
+
+              //存储jwt
+              if (this.user.rememberMe === true) {
+                //7天
+                window.localStorage.setItem(getTokenName(), resp.data.data);
+              } else {
+                //30分钟
+                window.sessionStorage.setItem(getTokenName(), resp.data.data);
+              }
               //跳转系统的主页面
               window.location.href = "/dashboard";
             } else {
               //登录失败
-              messageTip("用户名或密码错误",'error')
+              messageTip("用户名或密码错误", 'error')
             }
 
           })
 
         }
       })
+    },
+
+    //免登录
+    freeLogin() {
+      const token = window.localStorage.getItem(getTokenName());
+      if (token) {
+        doGet("/api/login/free", {}).then((resp) => {
+          if (resp.data.code === 200){
+            //token验证通过就可以免登录
+            window.location.href = "/dashboard";
+          }
+        })
+      }
     },
   },
 

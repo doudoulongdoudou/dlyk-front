@@ -191,12 +191,12 @@
         </el-icon>
 
         <el-dropdown :hide-on-click="false">
-          <span class="el-dropdown-link">豆豆龙<el-icon class="el-icon--right"><arrow-down/></el-icon></span>
+          <span class="el-dropdown-link">{{ user.name }}<el-icon class="el-icon--right"><arrow-down/></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>我的资料</el-dropdown-item>
               <el-dropdown-item>修改密码</el-dropdown-item>
-              <el-dropdown-item divided>退出登录</el-dropdown-item>
+              <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -206,7 +206,7 @@
       <el-main>Main</el-main>
 
       <!-- 下侧 -->
-      <el-footer>Copyright ©2024 豆豆龙科技无限责任公司版权所有 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
+      <el-footer>Copyright ©2024 版权所有：浙江没有豆豆龙科技有限公司 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
       </el-footer>
 
     </el-container>
@@ -215,7 +215,8 @@
 </template>
 
 <script>
-import {doGet} from "../http/httpRequest.js";
+import {doGet, doPost} from "../http/httpRequest.js";
+import {messageConfirm, messageTip, removeToken} from "../util/util.js";
 
 export default {
   name: "DashboardView",
@@ -223,7 +224,9 @@ export default {
   data() {
     return {
       //控制左侧菜单是否展开折叠，true为折叠
-      isCollapse: false
+      isCollapse: false,
+      //登录用户对象,初始为空
+      user: {},
     }
   },
 
@@ -239,11 +242,40 @@ export default {
       this.isCollapse = !this.isCollapse;
     },
 
+    //加载登录用户信息
     loadLoginUser() {
-      doGet("api/login/info", {}).then( (resp) => {
-        console.log(resp);
+      doGet("/api/login/info", {}).then((resp) => {
+        // console.log(resp);
+        this.user = resp.data.data;
+      })
+    },
+
+    //退出登录
+    logout() {
+      doGet("/api/logout", {}).then((resp) => {
+        if (resp.data.code === 200) {
+          //清除前端的token
+          removeToken();
+          messageTip("登出成功", "success");
+          //跳转登录页
+          window.location.href = "/";
+        } else {
+          //强行退出登录
+          messageConfirm('登出异常，是否强制登出？')
+              //点击确定触发then()
+              .then(() => {
+                removeToken();
+                //跳转登录页
+                window.location.href = "/";
+              })
+              //点击取消触发catch()
+              .catch(() => {
+                messageTip("取消强制登出", "warning")
+              })
+        }
       })
     }
+
   }
 }
 </script>
