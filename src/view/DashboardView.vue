@@ -2,7 +2,7 @@
   <el-container>
     <!-- 左侧 -->
     <el-aside :width="isCollapse ? '64px' : '200px'">
-      <div class="menuTitle">动力云客管理系统</div>
+      <div class="menuTitle" @click="home">莓酉科技管理系统</div>
       <el-menu
           active-text-color="#ffd04b"
           background-color="#334157"
@@ -11,6 +11,7 @@
           text-color="#fff"
           :collapse="isCollapse"
           :collapse-transition="false"
+          :router="true"
           style="border-right: solid 0px"
           @open="handleOpen"
           @close="handleClose"
@@ -151,7 +152,7 @@
             <span>用户管理</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="7-1">
+            <el-menu-item index="/dashboard/user">
               <el-icon>
                 <User/>
               </el-icon>
@@ -203,10 +204,13 @@
       </el-header>
 
       <!-- 中间 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <!--渲染子路由-->
+        <router-view/>
+      </el-main>
 
       <!-- 下侧 -->
-      <el-footer>Copyright ©2024 版权所有：浙江没有豆豆龙科技有限公司 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
+      <el-footer>Copyright ©2024 版权所有：浙江莓酉豆豆龙科技有限公司 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
       </el-footer>
 
     </el-container>
@@ -217,9 +221,11 @@
 <script>
 import {doGet, doPost} from "../http/httpRequest.js";
 import {messageConfirm, messageTip, removeToken} from "../util/util.js";
+import UserManagerView from "./UserView.vue";
 
 export default {
   name: "DashboardView",
+  components: {UserManagerView},
 
   data() {
     return {
@@ -274,7 +280,12 @@ export default {
               })
         }
       })
-    }
+    },
+
+    //跳转首页
+    home() {
+      window.location.href = "/dashboard";
+    },
 
   }
 }
@@ -314,6 +325,7 @@ export default {
   text-align: center;
   font-weight: bold;
   color: #fff;
+  cursor: pointer;
 }
 
 .show {
