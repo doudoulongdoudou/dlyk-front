@@ -206,11 +206,11 @@
       <!-- 中间 -->
       <el-main>
         <!--渲染子路由-->
-        <router-view/>
+        <router-view v-if="isRouterAlive"/>
       </el-main>
 
       <!-- 下侧 -->
-      <el-footer>Copyright ©2024 版权所有：浙江莓酉豆豆龙科技有限公司 | 关于我们 | 网站备案/许可证号：浙ICP备 114514号-1
+      <el-footer>Copyright ©2024 版权所有：浙江莓酉豆豆龙科技有限公司  <el-link href="https://github.com/doudoulongdoudou" target="_blank">关于我</el-link>  网站备案/许可证号：浙ICP备 114514号-1
       </el-footer>
 
     </el-container>
@@ -233,6 +233,22 @@ export default {
       isCollapse: false,
       //登录用户对象,初始为空
       user: {},
+      //控制仪表盘右侧页面内容是否显示,默认是true显示
+      isRouterAlive: true
+    }
+  },
+
+  //提供者
+  provide() {
+    return {
+      //提供一个函数，要求是箭头函数
+      reload: () => {
+        this.isRouterAlive = false;
+        this.$nextTick(function () {
+          this.isRouterAlive= true;
+        })
+      },
+
     }
   },
 
