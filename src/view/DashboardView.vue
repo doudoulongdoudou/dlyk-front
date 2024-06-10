@@ -210,7 +210,7 @@
       </el-main>
 
       <!-- 下侧 -->
-      <el-footer>Copyright ©2024 版权所有：浙江莓酉豆豆龙科技有限公司  <el-link href="https://github.com/doudoulongdoudou" target="_blank">关于我</el-link>  网站备案/许可证号：浙ICP备 114514号-1
+      <el-footer>Copyright © 2024-2077 版权所有：浙江莓酉豆豆龙科技有限公司 网站备案/许可证号：浙ICP备 114514号-1 <el-link href="https://github.com/doudoulongdoudou" target="_blank">关于我</el-link>
       </el-footer>
 
     </el-container>

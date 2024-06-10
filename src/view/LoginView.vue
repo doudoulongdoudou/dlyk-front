@@ -115,7 +115,7 @@ export default {
 
           //验证通过可以提交登录,此处是封装了axios的方法，也可以直接使用axios.post
           doPost("/api/login", formData).then((resp) => {
-            console.log(resp);
+            // console.log(resp);
             //===必须类型和值都相等，而==的话类型可以不相同，即数字200和字符串"200"
             if (resp.data.code === 200) {
               //登录成功

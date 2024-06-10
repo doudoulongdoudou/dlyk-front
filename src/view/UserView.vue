@@ -8,7 +8,7 @@
       :prefix-icon="Search"
   />
   <el-button plain class="topButton" @click="add" type="primary">添加用户</el-button>
-  <el-button class="topButton" type="danger">批量删除</el-button>
+  <el-button class="topButton" type="danger" @click="batchDel">批量删除</el-button>
 
   <el-table
       ref="multipleTableRef"
@@ -34,15 +34,23 @@
   </el-table>
 
   <!--新增用户对话框 弹窗-->
-  <el-dialog v-model="userDialogVisible" title="【新增用户】" width="700">
+  <el-dialog v-model="userDialogVisible" :title="userQuery.id > 0 ? '【编辑用户】' : '【新增用户】'" width="700">
     <el-form class="userDialogForm" ref="userRefForm" :model="userQuery" label-width="auto" label-position="left"
              :rules="addUserRules">
       <el-form-item prop="loginAct" label="用户名">
         <el-input v-model="userQuery.loginAct" placeholder="用户名" clearable></el-input>
       </el-form-item>
-      <el-form-item prop="loginPwd" label="密码">
+
+      <!--编辑-->
+      <el-form-item label="密码" v-if="userQuery.id > 0">
+        <el-input type="password" v-model="userQuery.loginPwd" placeholder="不修改默认使用原密码"
+                  show-password></el-input>
+      </el-form-item>
+      <!--新增-->
+      <el-form-item prop="loginPwd" label="密码" v-else>
         <el-input type="password" v-model="userQuery.loginPwd" placeholder="密码" show-password></el-input>
       </el-form-item>
+
       <el-form-item prop="name" label="姓名">
         <el-input v-model="userQuery.name" placeholder="姓名" clearable></el-input>
       </el-form-item>
@@ -82,7 +90,7 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="userDialogVisible = false">取 消</el-button>
+        <el-button @click="cancelAdd">取 消</el-button>
         <el-button type="primary" @click="userSubmit">提 交</el-button>
       </div>
     </template>
@@ -101,15 +109,15 @@
 </template>
 
 <script>
-import {doGet, doPost} from "../http/httpRequest.js";
+import {doDelete, doGet, doPost, doPut} from "../http/httpRequest.js";
 import {Search} from "@element-plus/icons-vue";
-import {messageTip} from "../util/util.js";
+import {messageConfirm, messageTip} from "../util/util.js";
 
 export default {
   name: "UserView",
 
   //注入父页面的属性、函数
-  inject:['reload'],
+  inject: ['reload'],
 
   computed: {
     Search() {
@@ -163,6 +171,9 @@ export default {
         ],
       },
 
+      //用户id的数组
+      userIdArray: [],
+
     }
   },
 
@@ -171,16 +182,21 @@ export default {
   },
 
   methods: {
-    //勾选或者取消勾选时，触发该函数
-    handleSelectionChange() {
-
+    //勾选或取消触发此函数(已经勾选的数据会传给这个函数)
+    handleSelectionChange(selectionDataArray) {
+      this.userIdArray = [];
+      // console.log(selectionDataArray);
+      selectionDataArray.forEach(data => {
+        let userId = data.id;
+        this.userIdArray.push(userId);
+      })
     },
 
     //获取所有用户的信息   current 当前页
     getUserList(current) {
       doGet("/api/user/list", {current}).then((resp) => {
         if (resp.data.code === 200) {
-          console.log(resp);
+          // console.log(resp);
           this.userList = resp.data.data.list;
           this.pageNum = resp.data.data.pageNum;
           this.pageSize = resp.data.data.pageSize;
@@ -203,10 +219,17 @@ export default {
 
     //新增用户点击按钮  弹窗
     add() {
+      this.userQuery.id = 0;
       this.userDialogVisible = true;
     },
 
-    //新增用户  提交保存
+    //取消保存
+    cancelAdd() {
+      this.$refs.userRefForm.resetFields();
+      this.userDialogVisible = false;
+    },
+
+    //新增或编辑用户  提交保存
     userSubmit() {
       //FormData就像java的map，一个key一个value,通过formData.append()来添加数据
       let formData = new FormData();
@@ -214,26 +237,104 @@ export default {
       for (let field in this.userQuery) {
         formData.append(field, this.userQuery[field]);
       }
-
       this.$refs.userRefForm.validate((isValid) => {
         if (isValid) {
-          doPost("/api/user", formData).then((resp) => {
-            if (resp.data.code === 200) {
-              console.log(resp);
-              messageTip("提交成功", "success");
-              //页面刷新
-              this.reload();
-            } else {
-              messageTip("提交失败", "error");
-            }
-          })
+          //id大于0,表示编辑用户
+          if (this.userQuery.id > 0) {
+            doPut("/api/user", formData).then((resp) => {
+              if (resp.data.code === 200) {
+                // console.log(resp);
+                messageTip("编辑成功", "success");
+                //页面刷新
+                this.reload();
+              } else {
+                // console.log(resp);
+                messageTip("编辑失败", "error");
+              }
+            })
+          } else {
+            //新增用户
+            doPost("/api/user", formData).then((resp) => {
+              if (resp.data.code === 200) {
+                // console.log(resp);
+                messageTip("提交成功", "success");
+                //页面刷新
+                this.reload();
+              } else {
+                messageTip("提交失败", "error");
+              }
+            })
+          }
+          //关闭弹窗
+          this.userDialogVisible = false;
         }
       })
-
-      //关闭弹窗
-      this.userDialogVisible=false;
     },
 
+    //操作-编辑用户
+    edit(id) {
+      this.userDialogVisible = true;
+      this.loadUser(id);
+    },
+
+    //编辑用户-信息回显
+    loadUser(id) {
+      doGet("/api/user/" + id, {}).then((resp) => {
+        if (resp.data.code === 200) {
+          this.userQuery = resp.data.data;
+        }
+      })
+    },
+
+    //删除用户
+    del(id) {
+      messageConfirm("您确定要删除此用户吗？")
+          //点击确定触发then()
+          .then(() => {
+            //删除
+            doDelete("/api/user/" + id, {}).then(resp => {
+              if (resp.data.code === 200) {
+                messageTip("删除成功", "success");
+                //刷新页面
+                this.reload();
+              } else {
+                messageTip("删除失败，原因：" + resp.data.msg, "error");
+              }
+            })
+          })
+          //点击取消触发catch()
+          .catch(() => {
+            messageTip("取消删除", "warning");
+          })
+    },
+
+    //批量删除
+    batchDel() {
+      if (this.userIdArray.length <= 0) {
+        messageTip("请选择需要删除的数据", "warning")
+        return;
+      }
+      messageConfirm("您确定要批量删除这些用户吗？")
+          //点击确定触发then()
+          .then(() => {
+            //join作用  [1,2,3,4,5] ----> ids="1,2,3,4,5";
+            let ids = this.userIdArray.join(',');
+            doDelete("/api/user", {ids: ids})
+                .then(resp => {
+                  if (resp.data.code === 200) {
+                    messageTip("批量删除成功", "success");
+                    //刷新页面
+                    this.reload();
+                  } else {
+                    messageTip("批量删除失败，原因：" + resp.data.msg, "error");
+                  }
+                })
+          })
+          //点击取消触发catch()
+          .catch(() => {
+            messageTip("取消批量删除", "warning");
+          })
+    },
   },
 
 }

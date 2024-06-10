@@ -9,7 +9,7 @@
     </el-form-item>
 
     <el-form-item label="【密码】">
-      <el-input disabled placeholder="******" />
+      <el-input disabled placeholder="想看密码？你也配" />
     </el-form-item>
 
     <el-form-item label="【姓名】">
@@ -91,7 +91,7 @@ export default {
       let id = this.$route.params.id;
       doGet("/api/user/" + id, {}).then(resp => {
         if (resp.data.code === 200) {
-          console.log(resp);
+          // console.log(resp);
           this.userDetail = resp.data.data;
           if (!this.userDetail.createByDO){
             this.userDetail.createByDO={};

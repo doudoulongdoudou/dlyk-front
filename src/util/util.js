@@ -40,7 +40,7 @@ export function messageConfirm(msg){
     return ElMessageBox
         .confirm(
         msg,
-        'Warning',
+        '系统提示',
         {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
